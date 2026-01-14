@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "qr_generator_and_scanner",
     "short_name": "qr_generator_and_scanner",
+=======
+    "name": "qr_generator",
+    "short_name": "qr_generator",
+>>>>>>> 6d1e67de7dc813053555460c2fddc02d4e4ab662
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

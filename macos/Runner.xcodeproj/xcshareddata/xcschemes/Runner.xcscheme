@@ -15,7 +15,11 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
                BuildableName = "qr_generator_and_scanner.app"
+=======
+               BuildableName = "qr_generator.app"
+>>>>>>> 6d1e67de7dc813053555460c2fddc02d4e4ab662
                BlueprintName = "Runner"
                ReferencedContainer = "container:Runner.xcodeproj">
             </BuildableReference>
@@ -31,7 +35,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "qr_generator_and_scanner.app"
+=======
+            BuildableName = "qr_generator.app"
+>>>>>>> 6d1e67de7dc813053555460c2fddc02d4e4ab662
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -66,7 +74,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "qr_generator_and_scanner.app"
+=======
+            BuildableName = "qr_generator.app"
+>>>>>>> 6d1e67de7dc813053555460c2fddc02d4e4ab662
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -83,7 +95,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "qr_generator_and_scanner.app"
+=======
+            BuildableName = "qr_generator.app"
+>>>>>>> 6d1e67de7dc813053555460c2fddc02d4e4ab662
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
