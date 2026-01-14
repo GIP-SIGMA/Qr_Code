@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
 
 const Color primaryColor = Color(0xFF3A2EC3);
 
@@ -182,7 +185,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                                 child: const Text('Reset'),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: ElevatedButton.icon(
                                 onPressed: () async {
@@ -221,6 +224,95 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                                 label: const Text('Share QR'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primaryColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  if (_qrData == null || _qrData!.isEmpty) {
+                                    return;
+                                  }
+
+                                  final double devicePixelRatio = MediaQuery.of(
+                                    context,
+                                  ).devicePixelRatio;
+
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 100),
+                                  );
+
+                                  final Uint8List? imageBytes =
+                                      await _screenshotController.capture(
+                                        pixelRatio: devicePixelRatio,
+                                      );
+
+                                  if (!mounted) return;
+
+                                  if (imageBytes != null) {
+                                    final pw.Document pdf = pw.Document();
+                                    final pw.MemoryImage pwImage =
+                                        pw.MemoryImage(imageBytes);
+
+                                    pdf.addPage(
+                                      pw.Page(
+                                        pageFormat: PdfPageFormat.a4,
+                                        build: (pw.Context ctx) {
+                                          return pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.center,
+                                            children: [
+                                              pw.SizedBox(height: 20),
+                                              pw.Text(
+                                                'QR Code',
+                                                style: pw.TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight:
+                                                      pw.FontWeight.bold,
+                                                ),
+                                              ),
+                                              pw.SizedBox(height: 12),
+                                              pw.Center(
+                                                child: pw.Image(
+                                                  pwImage,
+                                                  width: 200,
+                                                  height: 200,
+                                                ),
+                                              ),
+                                              pw.SizedBox(height: 12),
+                                              pw.Text(
+                                                _qrData ?? '',
+                                                style: pw.TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              pw.Spacer(),
+                                              pw.Divider(),
+                                              pw.SizedBox(height: 8),
+                                              pw.Text(
+                                                'Dibuat oleh: Ghifari Atallah',
+                                                style: pw.TextStyle(
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                              pw.SizedBox(height: 8),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    );
+
+                                    await Printing.layoutPdf(
+                                      onLayout: (PdfPageFormat format) async =>
+                                          pdf.save(),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(Icons.print),
+                                label: const Text('Print PDF'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.teal,
                                 ),
                               ),
                             ),
