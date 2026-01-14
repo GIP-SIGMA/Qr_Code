@@ -1,4 +1,3 @@
-
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart'; // untuk kReleaseMode
 import 'package:flutter/material.dart';
@@ -13,10 +12,7 @@ void main() {
     DevicePreview(
       enabled: !kReleaseMode, // mati otomatis saat build release
       defaultDevice: Devices.ios.iPhone11ProMax,
-      devices: [
-        Devices.ios.iPhone11ProMax,
-        Devices.ios.iPadPro11Inches,
-      ],
+      devices: [Devices.ios.iPhone11ProMax, Devices.ios.iPadPro11Inches],
       builder: (context) => const MainApp(),
     ),
   );
@@ -29,7 +25,6 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // Integrasi Device Preview (wajib ketiga baris ini)
-      useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
 
@@ -63,5 +58,3 @@ class MainApp extends StatelessWidget {
     );
   }
 }
-
-

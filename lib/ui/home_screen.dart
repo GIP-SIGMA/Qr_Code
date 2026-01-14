@@ -13,8 +13,6 @@ class User {
     required this.role,
     required this.profileImagePath,
   });
-
-  
 }
 
 class HomeScreen extends StatelessWidget {
@@ -120,10 +118,7 @@ class UserProfileHeader extends StatelessWidget {
           children: [
             Text(
               'Hello, Ghifari Atallah',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             Text(
               user.role,
@@ -161,11 +156,11 @@ class _MenuButton extends StatelessWidget {
           : null,
       child: Container(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
+          color: color.withAlpha((0.15 * 255).round()),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withAlpha((0.05 * 255).round()),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -176,23 +171,13 @@ class _MenuButton extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 48,
-              ),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: Icon(icon, color: Colors.white, size: 48),
             ),
             const SizedBox(height: 16),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
