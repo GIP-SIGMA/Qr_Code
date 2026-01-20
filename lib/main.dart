@@ -1,7 +1,7 @@
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart'; // untuk kReleaseMode
+import 'package:flutter/foundation.dart'; 
 import 'package:flutter/material.dart';
-
+import 'package:qr_generator_and_scanner/ui/print_screen.dart';
 import 'ui/splash_screen.dart';
 import 'ui/home_screen.dart';
 import 'ui/qr_generator_screen.dart';
@@ -54,6 +54,7 @@ class MainApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/create': (context) => const QrGeneratorScreen(),
         '/scan': (context) => const QrScannerScreen(),
+        '/print': (context) => const PrintScreen(),
       },
     );
   }

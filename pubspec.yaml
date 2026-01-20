@@ -76,11 +76,7 @@ flutter:
   
   # Daftar folder assets (akhiri dengan / agar seluruh isi folder terbaca)
   assets:
-    - assets/images/placeholder-splash.png
-    - assets/images/profile.jpg
-    - assets/images/qr-placeholder.png
-    - assets/images/scan-icon.png
-    - assets/images/success-check.png
+    - assets/images/
     - assets/fonts/
   
   # Custom font: Manrope (Regular, Medium, SemiBold, Bold)

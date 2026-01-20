@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:pdf/pdf.dart';
+import 'package:qr_generator_and_scanner/ui/Print_screen.dart'; 
 
 const Color primaryColor = Color(0xFF3A2EC3);
 
@@ -28,9 +26,47 @@ class QrGeneratorScreen extends StatefulWidget {
 
 class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
   final ScreenshotController _screenshotController = ScreenshotController();
-
   String? _qrData;
   Color _qrColor = Colors.white;
+
+  
+  Future<void> _sendEmailFriendly() async {
+    final Uint8List? imageBytes = await _screenshotController.capture();
+    if (imageBytes != null) {
+      await Share.shareXFiles(
+        [XFile.fromData(imageBytes, name: 'qr_code.png', mimeType: 'image/png')],
+        subject: 'QR Code dari QR S&G App',
+        text: 'Ini QR Code untuk: ${_qrData ?? ""}\n\nDibuat menggunakan QR S&G oleh Ghifari',
+      );
+    }
+  }
+
+  
+  void _navigateToPrint() async {
+    final Uint8List? imageBytes = await _screenshotController.capture();
+    if (imageBytes != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PrintScreen(
+            qrImageBytes: imageBytes,
+            qrData: _qrData,
+            userName: "Ghifari",
+          ),
+        ),
+      );
+    }
+  }
+
+  // Fungsi Share Biasa
+  Future<void> _shareQr() async {
+    final Uint8List? imageBytes = await _screenshotController.capture();
+    if (imageBytes != null) {
+      await Share.shareXFiles([
+        XFile.fromData(imageBytes, name: 'qrcode.png', mimeType: 'image/png'),
+      ]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +74,6 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
       appBar: AppBar(
         title: const Text('Create QR', style: TextStyle(color: Colors.white)),
         backgroundColor: primaryColor,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -48,13 +83,13 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
         children: [
           Column(
             children: [
-              Container(height: 220, color: primaryColor),
+              Container(height: 200, color: primaryColor),
               Expanded(child: Container(color: Colors.grey.shade50)),
             ],
           ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Container(
@@ -62,13 +97,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha((0.08 * 255).round()),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20)],
                     ),
                     child: Column(
                       children: [
@@ -79,30 +108,12 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                             decoration: BoxDecoration(
                               color: _qrColor,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.black12,
-                                width: 2,
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 12,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
+                              border: Border.all(color: Colors.black12),
                             ),
                             child: _qrData == null || _qrData!.isEmpty
-                                ? const Padding(
-                                    padding: EdgeInsets.all(40),
-                                    child: Text(
-                                      'Masukkan teks/link untuk generate QR',
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
+                                ? const SizedBox(
+                                    height: 200,
+                                    child: Center(child: Text('Masukkan teks untuk generate QR')))
                                 : PrettyQrView.data(
                                     data: _qrData!,
                                     decoration: const PrettyQrDecoration(
@@ -111,210 +122,57 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 24),
                         TextField(
                           decoration: InputDecoration(
                             labelText: 'Link atau Teks',
-                            hintText: 'https://example.com atau teks apa saja',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          maxLines: 3,
-                          onChanged: (value) {
-                            setState(
-                              () => _qrData = value.trim().isEmpty
-                                  ? null
-                                  : value.trim(),
-                            );
-                          },
+                          onChanged: (value) => setState(() => _qrData = value.trim().isEmpty ? null : value.trim()),
                         ),
                         const SizedBox(height: 24),
-                        Text(
-                          'Pilih Warna Background QR',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: qrColors.map((color) {
-                            return GestureDetector(
-                              onTap: () => setState(() => _qrColor = color),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: _qrColor == color
-                                        ? Colors.black
-                                        : Colors.transparent,
-                                    width: 3,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 6,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 32),
-                        const Divider(height: 1),
-                        const SizedBox(height: 16),
-                        Row(
+                        // Action Buttons
+                        Column(
                           children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _qrData = null;
-                                    _qrColor = Colors.white;
-                                  });
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                ),
-                                child: const Text('Reset'),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
+                            SizedBox(
+                              width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  if (_qrData == null || _qrData!.isEmpty) {
-                                    return;
-                                  }
-
-                                  // Ambil devicePixelRatio sebelum jeda/await supaya tidak pakai BuildContext setelah async gap
-                                  final double devicePixelRatio = MediaQuery.of(
-                                    context,
-                                  ).devicePixelRatio;
-
-                                  // Delay kecil untuk render selesai
-                                  await Future.delayed(
-                                    const Duration(milliseconds: 100),
-                                  );
-
-                                  final Uint8List? imageBytes =
-                                      await _screenshotController.capture(
-                                        pixelRatio: devicePixelRatio,
-                                      );
-
-                                  if (!mounted) return;
-
-                                  if (imageBytes != null) {
-                                    await Share.shareXFiles([
-                                      XFile.fromData(
-                                        imageBytes,
-                                        name: 'qrcode_dateTime.png',
-                                        mimeType: 'image/png',
-                                      ),
-                                    ]);
-                                  }
-                                },
-                                icon: const Icon(Icons.share),
-                                label: const Text('Share QR'),
+                                onPressed: _qrData == null ? null : _sendEmailFriendly,
+                                icon: const Icon(Icons.send),
+                                label: const Text('Send via Email'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
+                                  backgroundColor: Colors.green.shade700,
+                                  foregroundColor: Colors.white,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  if (_qrData == null || _qrData!.isEmpty) {
-                                    return;
-                                  }
-
-                                  final double devicePixelRatio = MediaQuery.of(
-                                    context,
-                                  ).devicePixelRatio;
-
-                                  await Future.delayed(
-                                    const Duration(milliseconds: 100),
-                                  );
-
-                                  final Uint8List? imageBytes =
-                                      await _screenshotController.capture(
-                                        pixelRatio: devicePixelRatio,
-                                      );
-
-                                  if (!mounted) return;
-
-                                  if (imageBytes != null) {
-                                    final pw.Document pdf = pw.Document();
-                                    final pw.MemoryImage pwImage =
-                                        pw.MemoryImage(imageBytes);
-
-                                    pdf.addPage(
-                                      pw.Page(
-                                        pageFormat: PdfPageFormat.a4,
-                                        build: (pw.Context ctx) {
-                                          return pw.Column(
-                                            crossAxisAlignment:
-                                                pw.CrossAxisAlignment.center,
-                                            children: [
-                                              pw.SizedBox(height: 20),
-                                              pw.Text(
-                                                'QR Code',
-                                                style: pw.TextStyle(
-                                                  fontSize: 24,
-                                                  fontWeight:
-                                                      pw.FontWeight.bold,
-                                                ),
-                                              ),
-                                              pw.SizedBox(height: 12),
-                                              pw.Center(
-                                                child: pw.Image(
-                                                  pwImage,
-                                                  width: 200,
-                                                  height: 200,
-                                                ),
-                                              ),
-                                              pw.SizedBox(height: 12),
-                                              pw.Text(
-                                                _qrData ?? '',
-                                                style: pw.TextStyle(
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              pw.Spacer(),
-                                              pw.Divider(),
-                                              pw.SizedBox(height: 8),
-                                              pw.Text(
-                                                'Dibuat oleh: Ghifari Atallah',
-                                                style: pw.TextStyle(
-                                                  fontSize: 10,
-                                                ),
-                                              ),
-                                              pw.SizedBox(height: 8),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    );
-
-                                    await Printing.layoutPdf(
-                                      onLayout: (PdfPageFormat format) async =>
-                                          pdf.save(),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(Icons.print),
-                                label: const Text('Print PDF'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.teal,
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: _qrData == null ? null : _navigateToPrint,
+                                    icon: const Icon(Icons.print),
+                                    label: const Text('Print PDF'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange.shade800,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: _qrData == null ? null : _shareQr,
+                                    icon: const Icon(Icons.share),
+                                    label: const Text('Share'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primaryColor,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
